@@ -1,7 +1,7 @@
 const ALLOWED_HOST = /(^|\.)temporadalivre\.com$/i;
 
 function decodeHtml(value = '') {
-  return value
+  return String(value)
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
@@ -12,13 +12,15 @@ function decodeHtml(value = '') {
     .replace(/&#x([\da-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));
 }
 
-function meta(html, key) {
-  const tags = html.match(/<meta\\b[^>]*>/gi) || [];
-  for (const tag of tags) {
-    const name = tag.match(/\\b(?:property|name)\\s*=\\s*["']([^"']+)["']/i)?.[1]?.toLowerCase();
-    if (name !== key.toLowerCase()) continue;
-    const content = tag.match(/\\bcontent\\s*=\\s*["']([^"']*)["']/i)?.[1];
-    if (content !== undefined) return decodeHtml(content);
+function meta(html, ...keys) {
+  const tags = html.match(/<meta\b[^>]*>/gi) || [];
+  for (const key of keys) {
+    for (const tag of tags) {
+      const name = tag.match(/\b(?:property|name|itemprop)\s*=\s*["']([^"']+)["']/i)?.[1]?.toLowerCase();
+      if (name !== key.toLowerCase()) continue;
+      const content = tag.match(/\bcontent\s*=\s*["']([^"']*)["']/i)?.[1];
+      if (content !== undefined) return decodeHtml(content);
+    }
   }
   return '';
 }
@@ -29,6 +31,42 @@ function validUrl(value) {
     throw new Error('Por segurança, use um link HTTPS do TemporadaLivre.');
   }
   return url;
+}
+
+function absoluteImage(raw, base) {
+  try {
+    const url = new URL(decodeHtml(raw).trim(), base);
+    if (url.protocol !== 'https:' || /^(data|blob):$/i.test(url.protocol) || url.href === new URL(base).href) return '';
+    if (/(logo|avatar|icon|sprite|placeholder|loading|pixel)/i.test(url.pathname)) return '';
+    return url.toString();
+  } catch {
+    return '';
+  }
+}
+
+function collectImages(html, current) {
+  const found = [];
+  const add = value => {
+    const url = absoluteImage(value, current);
+    if (url && !found.includes(url)) found.push(url);
+  };
+  [
+    meta(html, 'og:image:secure_url', 'og:image'),
+    meta(html, 'twitter:image', 'twitter:image:src'),
+    meta(html, 'image')
+  ].forEach(add);
+
+  const imageTags = html.match(/<img\b[^>]*>/gi) || [];
+  for (const tag of imageTags) {
+    for (const attr of ['data-src', 'data-original', 'data-lazy-src', 'src']) {
+      const value = tag.match(new RegExp('\\b' + attr + '\\s*=\\s*["\\x27]([^"\\x27]+)', 'i'))?.[1];
+      if (value) add(value);
+    }
+    const srcset = tag.match(/\bsrcset\s*=\s*["']([^"']+)["']/i)?.[1];
+    if (srcset) add(srcset.split(',')[0].trim().split(/\s+/)[0]);
+    if (found.length >= 12) break;
+  }
+  return found.slice(0, 12);
 }
 
 export default async function handler(req, res) {
@@ -70,19 +108,14 @@ export default async function handler(req, res) {
     const type = response.headers.get('content-type') || '';
     if (!type.includes('text/html')) throw new Error('O link não abriu uma página de anúncio HTML.');
     const html = (await response.text()).slice(0, 2_000_000);
-    const title = decodeHtml(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || meta(html, 'og:title')).replace(/\s+/g, ' ').trim();
-    const description = meta(html, 'og:description') || meta(html, 'description');
-    const imageTags = html.match(/<img\b[^>]*>/gi) || [];
-    const image = meta(html, 'og:image') || imageTags
-      .map(tag => tag.match(/\b(?:src|data-src|data-original)\s*=\s*["']([^"']+)["']/i)?.[1] || '')
-      .filter(src => src && !/(logo|avatar|icon|sprite|placeholder)/i.test(src))
-      .map(src => { try { return new URL(decodeHtml(src), current).toString(); } catch { return ''; } })
-      .find(src => /^https:\/\//i.test(src)) || '';
-    const videoRaw = meta(html, 'og:video:secure_url') || meta(html, 'og:video') || meta(html, 'og:video:url') || meta(html, 'twitter:player:stream');
+    const title = decodeHtml(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || meta(html, 'og:title', 'twitter:title')).replace(/\s+/g, ' ').trim();
+    const description = meta(html, 'og:description', 'description', 'twitter:description');
+    const images = collectImages(html, current);
+    const videoRaw = meta(html, 'og:video:secure_url', 'og:video', 'og:video:url', 'twitter:player:stream');
     let video = '';
     if (videoRaw) {
       try {
-        const candidate = new URL(decodeHtml(videoRaw), current);
+        const candidate = new URL(videoRaw, current);
         if (candidate.protocol === 'https:') video = candidate.toString();
       } catch {}
     }
@@ -100,15 +133,16 @@ export default async function handler(req, res) {
       url: current.toString(),
       title,
       description,
-      image,
+      image: images[0] || '',
+      images,
       video,
       text
     });
   } catch (error) {
     return res.status(400).json({
       error: error?.name === 'TimeoutError'
-        ? 'A página demorou demais para responder. Tente novamente ou cole o texto do anúncio.'
-        : (error?.message || 'Não foi possível importar esse link.')
+        ? 'A página demorou para responder. Tente novamente ou use “Colar texto”.'
+        : error?.message || 'Falha ao ler o anúncio.'
     });
   }
 }
