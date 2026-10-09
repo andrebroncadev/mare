@@ -1,4 +1,4 @@
-const LISTING_HOST = /(^|\\.)temporadalivre\\.com$/i;
+const LISTING_HOST = /(^|\.)temporadalivre\.com$/i;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
@@ -9,9 +9,9 @@ function decodeHtml(value = '') {
     .replace(/&#39;|&apos;/gi, "'")
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>')
-    .replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
-    .replace(/&#x([\\da-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
-    .replace(/\\\\\\//g, '/');
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([\da-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/\\\//g, '/');
 }
 
 function listingUrl(value) {
@@ -26,9 +26,9 @@ function imageUrl(value) {
   const url = new URL(value);
   const host = url.hostname.toLowerCase();
   if (url.protocol !== 'https:' || url.username || url.password || !host.includes('.') ||
-      host === 'localhost' || host.endsWith('.localhost') || /^\\d{1,3}(?:\\.\\d{1,3}){3}$/.test(host) ||
+      host === 'localhost' || host.endsWith('.localhost') || /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) ||
       host === '::1' || host.startsWith('127.') || host.startsWith('10.') || host.startsWith('192.168.') ||
-      /^172\\.(1[6-9]|2\\d|3[01])\\./.test(host)) {
+      /^172\.(1[6-9]|2\d|3[01])\./.test(host)) {
     throw new Error('O endereço da imagem não é permitido.');
   }
   return url;
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
     }
     const html = decodeHtml((await page.text()).slice(0, 2_000_000));
     const requested = imageUrl(submittedImage);
-    const normalizedHtml = html.replace(/\\\\\\//g, '/');
+    const normalizedHtml = html.replace(/\\\//g, '/');
     if (!normalizedHtml.includes(requested.toString()) && !normalizedHtml.includes(requested.toString().replace(/&/g, '&amp;'))) {
       throw new Error('A imagem não foi encontrada no anúncio informado.');
     }
