@@ -1,6 +1,5 @@
 const LISTING_HOST = /(^|\.)temporadalivre\.com$/i;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
 function decodeHtml(value = '') {
   return String(value)
@@ -92,9 +91,8 @@ export default async function handler(req, res) {
     const type = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
     if (!IMAGE_TYPES.has(type)) throw new Error('O arquivo não é uma imagem compatível.');
     const length = Number(response.headers.get('content-length') || 0);
-    if (length > MAX_IMAGE_BYTES) throw new Error('A imagem excede o limite de 8 MB.');
     const bytes = Buffer.from(await response.arrayBuffer());
-    if (!bytes.length || bytes.length > MAX_IMAGE_BYTES) throw new Error('A imagem está vazia ou excede 8 MB.');
+    if (!bytes.length) throw new Error('A imagem está vazia.');
 
     res.setHeader('Content-Type', type);
     res.setHeader('Content-Length', String(bytes.length));
