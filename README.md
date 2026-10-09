@@ -43,3 +43,6 @@ Ferramenta de trabalho para organizar imóveis de temporada, consultar preços c
 - O Maré usa tabelas com prefixo mare_, separadas das tabelas do Central Imóveis.
 - No projeto Supabase de teste, as políticas atuais permitem acesso compartilhado a usuários autenticados. Antes de convidar outras pessoas ou usar dados reais em produção, migre para um projeto exclusivo do Maré e configure políticas por usuário ou organização.
 - Revise e confirme manualmente dados, valores, datas e disponibilidade antes de enviar uma oferta ao cliente.
+- O catálogo não exibe nem exige código interno de anúncio; os imóveis são identificados pelo ID do banco, sem apresentar esse identificador ao usuário.
+- A importação não impõe limite artificial de quantidade de fotos. O sistema tenta copiar todas as imagens detectadas para o Supabase Storage; se alguma cópia falhar, conserva o link original e informa o aviso.
+- Os preços importados ficam na área interna de consulta e no cálculo de ofertas do Maré. Não devem ser enviados ao Feedback Maker nem incluídos em PDFs/relatórios de feedback destinados a proprietários ou clientes.
