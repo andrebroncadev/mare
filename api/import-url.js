@@ -36,37 +36,51 @@ function validUrl(value) {
 function absoluteImage(raw, base) {
   try {
     const url = new URL(decodeHtml(raw).trim(), base);
-    if (url.protocol !== 'https:' || /^(data|blob):$/i.test(url.protocol) || url.href === new URL(base).href) return '';
-    if (/(logo|avatar|icon|sprite|placeholder|loading|pixel)/i.test(url.pathname)) return '';
+    if (url.protocol !== 'https:' || url.href === new URL(base).href) return '';
+    const path = url.pathname.toLowerCase();
+    const bad = /(logo|avatar|icon|sprite|placeholder|loading|pixel|flag|keyboard|arrow|eye|password|visibility|captcha|emoji|favicon|badge)/i;
+    if (bad.test(path) || /\.(svg|gif)(?:$|\?)/i.test(path)) return '';
     return url.toString();
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 }
 
 function collectImages(html, current) {
-  const found = [];
-  const add = value => {
-    const url = absoluteImage(value, current);
-    if (url && !found.includes(url)) found.push(url);
+  const candidates = [];
+  const add = (raw, tag = '') => {
+    const url = absoluteImage(raw, current);
+    if (!url || candidates.some(x => x.url === url)) return;
+    const w = Number(tag.match(/\bwidth\s*=\s*["']?(\d+)/i)?.[1] || 0);
+    const h = Number(tag.match(/\bheight\s*=\s*["']?(\d+)/i)?.[1] || 0);
+    if ((w && w < 180) || (h && h < 130)) return;
+    let score = 0;
+    if (w >= 600) score += 4;
+    if (h >= 400) score += 4;
+    if (w >= 1000) score += 3;
+    if (/(large|original|full|high|gallery|photo|imovel|property|listing)/i.test(url)) score += 2;
+    if (/(thumb|small|mini|resize|tiny|low|150x|100x)/i.test(url)) score -= 4;
+    candidates.push({url,score,order:candidates.length});
   };
-  [
-    meta(html, 'og:image:secure_url', 'og:image'),
-    meta(html, 'twitter:image', 'twitter:image:src'),
-    meta(html, 'image')
-  ].forEach(add);
-
+  const og = meta(html, 'og:image:secure_url', 'og:image');
+  const tw = meta(html, 'twitter:image', 'twitter:image:src');
+  if (og) add(og);
+  if (tw) add(tw);
   const imageTags = html.match(/<img\b[^>]*>/gi) || [];
   for (const tag of imageTags) {
-    for (const attr of ['data-src', 'data-original', 'data-lazy-src', 'src']) {
+    if (/(flag|bandeira|keyboard|arrow|eye|password|visibility|icon|logo|captcha)/i.test(tag)) continue;
+    for (const attr of ['data-src', 'data-original', 'data-lazy-src', 'data-image', 'src']) {
       const value = tag.match(new RegExp('\\b' + attr + '\\s*=\\s*["\\x27]([^"\\x27]+)', 'i'))?.[1];
-      if (value) add(value);
+      if (value) add(value, tag);
     }
     const srcset = tag.match(/\bsrcset\s*=\s*["']([^"']+)["']/i)?.[1];
-    if (srcset) add(srcset.split(',')[0].trim().split(/\s+/)[0]);
-    if (found.length >= 12) break;
+    if (srcset) {
+      const options = srcset.split(',').map(part => part.trim()).map(part => {
+        const m = part.match(/^(\S+)\s+(\d+)(w|x)$/);
+        return m ? {url:m[1],size:Number(m[2])} : {url:part.split(/\s+/)[0],size:0};
+      }).sort((x,y)=>y.size-x.size);
+      if (options[0]?.url) add(options[0].url, tag + ' width="' + (options[0].size||0) + '"');
+    }
   }
-  return found.slice(0, 12);
+  return candidates.sort((a,b)=>b.score-a.score||a.order-b.order).slice(0,12).map(x=>x.url);
 }
 
 export default async function handler(req, res) {
