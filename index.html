@@ -1,2 +1,73 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#123b35"><meta name="description" content="BancoImob — catálogo e portfólio de imóveis para temporada em Juquehy."><meta property="og:type" content="website"><meta property="og:site_name" content="BancoImob"><meta property="og:title" content="BancoImob | Imóveis de temporada"><meta property="og:description" content="Catálogo de imóveis para temporada em Juquehy, com fotos e comodidades."><meta property="og:image" content="https://res.cloudinary.com/yif0cgpi/image/upload/v1791578737/bancoimob/bancoimob-social-preview.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:type" content="image/png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="BancoImob | Imóveis de temporada"><meta name="twitter:description" content="Catálogo de imóveis para temporada em Juquehy, com fotos e comodidades."><meta name="twitter:image" content="https://res.cloudinary.com/yif0cgpi/image/upload/v1791578737/bancoimob/bancoimob-social-preview.png"><title>BancoImob — Gestão de temporada</title></head><body><div id="app">Carregando BancoImob…</div><script type="module" src="/src/main.js"></script></body></html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123b35">
+<meta name="description" content="BancoImob — catálogo e portfólio de imóveis para temporada em Juquehy.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BancoImob">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/bancoimob-192.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/bancoimob-192.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BancoImob">
+<meta property="og:title" content="BancoImob | Imóveis de temporada">
+<meta property="og:description" content="Catálogo de imóveis para temporada em Juquehy, com fotos e comodidades.">
+<meta property="og:image" content="https://res.cloudinary.com/yif0cgpi/image/upload/v1791578737/bancoimob/bancoimob-social-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BancoImob | Imóveis de temporada">
+<meta name="twitter:description" content="Catálogo de imóveis para temporada em Juquehy, com fotos e comodidades.">
+<meta name="twitter:image" content="https://res.cloudinary.com/yif0cgpi/image/upload/v1791578737/bancoimob/bancoimob-social-preview.png">
+<title>BancoImob — Gestão de temporada</title>
+<style>
+#install-app{position:fixed;right:16px;bottom:16px;z-index:9999;border:0;border-radius:999px;padding:12px 17px;background:#123b35;color:#fff;font:600 14px/1.2 system-ui,sans-serif;box-shadow:0 5px 22px #0002;cursor:pointer}
+#install-app[hidden]{display:none}
+#install-app:focus-visible{outline:3px solid #e4c783;outline-offset:3px}
+@media(min-width:760px){#install-app{right:24px;bottom:24px}}
+</style>
+</head>
+<body>
+<div id="app">Carregando BancoImob…</div>
+<button id="install-app" type="button" hidden>＋ Instalar BancoImob</button>
+<script type="module" src="/src/main.js"></script>
+<script>
+(() => {
+  const installButton = document.getElementById('install-app');
+  let installPrompt = null;
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(error => {
+        console.warn('Não foi possível ativar o modo instalável:', error);
+      });
+    });
+  }
+
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    installPrompt = event;
+    installButton.hidden = false;
+  });
+
+  installButton.addEventListener('click', async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    installButton.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    installButton.hidden = true;
+  });
+})();
+</script>
+</body>
+</html>
