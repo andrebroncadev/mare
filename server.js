@@ -107,6 +107,7 @@ async function getPublicProperty(token) {
     method: 'POST',
     headers: {
       apikey: anonKey,
+      Authorization: 'Bearer ' + anonKey,
       'Content-Type': 'application/json',
       Accept: 'application/json'
     },
