@@ -138,3 +138,16 @@ header{background:#fffefa;border-color:#e8e1d3}
 .price-sheet-title h2{font:800 20px Manrope;color:#17345b;margin:5px 0}
 .price-sheet-title p{font-size:11px;color:#817b70;margin:0}
 @media(max-width:700px){.price-home-option{padding:13px}.price-home-option strong{white-space:normal}.price-sheet-title{align-items:flex-start;flex-direction:column;width:100%}.price-sheet-title .actions{width:100%}}
+
+.amenity-editor{border:1px solid #e8e1d3;border-radius:12px;padding:14px;background:#fffefa}
+.amenity-editor>label{display:block;margin-bottom:10px;font-size:12px;color:#17345b}
+.amenity-editor>p{font-size:10px;line-height:1.5;color:#817b70;margin:10px 0}
+.amenity-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.amenity-checks label{display:flex;align-items:center;gap:7px;padding:8px;border:1px solid #eee7d9;border-radius:8px;font-size:11px}
+.amenity-checks input{width:auto;margin:0;accent-color:#17345b}
+.amenity-order-list{display:grid;gap:6px}
+.amenity-order-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid #e8e1d3;border-radius:8px;background:#f8f5ed;font-size:11px;color:#17345b}
+.amenity-order-item>div{display:flex;gap:5px}
+.amenity-order-item button{border:1px solid #e0d4bb;border-radius:6px;background:white;color:#17345b;padding:4px 8px}
+.amenity-order-item button:disabled{opacity:.3}
+@media(max-width:600px){.amenity-checks{grid-template-columns:1fr}}
