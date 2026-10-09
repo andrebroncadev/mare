@@ -78,6 +78,14 @@ export default async function handler(req, res) {
       .filter(src => src && !/(logo|avatar|icon|sprite|placeholder)/i.test(src))
       .map(src => { try { return new URL(decodeHtml(src), current).toString(); } catch { return ''; } })
       .find(src => /^https:\/\//i.test(src)) || '';
+    const videoRaw = meta(html, 'og:video:secure_url') || meta(html, 'og:video') || meta(html, 'og:video:url') || meta(html, 'twitter:player:stream');
+    let video = '';
+    if (videoRaw) {
+      try {
+        const candidate = new URL(decodeHtml(videoRaw), current);
+        if (candidate.protocol === 'https:') video = candidate.toString();
+      } catch {}
+    }
     const body = html
       .replace(/<(script|style|noscript|svg|iframe)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
       .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/section|\/article|\/tr)>/gi, '\n')
@@ -93,6 +101,7 @@ export default async function handler(req, res) {
       title,
       description,
       image,
+      video,
       text
     });
   } catch (error) {

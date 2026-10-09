@@ -81,3 +81,13 @@ header{background:#fffefa;border-color:#e8e1d3}
 .card-actions{display:flex;gap:5px}.card-actions button{font-size:10px}
 @media(max-width:900px){.period-launch-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.period-launch-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.featured-homes{grid-template-columns:1fr}.catalog-selection{top:2px}.catalog-periods{gap:5px}.catalog-periods button{padding:7px 8px;font-size:10px}}
+
+
+/* Mídia de imóveis: imagens e vídeos sem alterar a identidade visual */
+.photo-tile img,.photo-tile video.media-video-frame,.photo-tile iframe.media-video-frame{display:block;width:100%;height:112px;object-fit:cover;border:0;background:#ece7dc}
+.video-cover{display:flex;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-decoration:none;background:linear-gradient(140deg,#e9e1cf,#d9d0bb);color:#17345b}
+.video-cover>span{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#17345b;color:#fff;font-size:18px;padding-left:3px}
+.video-cover b{font-size:11px}.video-cover small{font-size:9px;letter-spacing:.4px}
+.photo-manager-head span{white-space:nowrap}
+#add-video-link{margin-top:9px}
+@media(max-width:700px){.photo-tile img,.photo-tile video.media-video-frame,.photo-tile iframe.media-video-frame{height:120px}}
