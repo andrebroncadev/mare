@@ -172,3 +172,12 @@ header{background:#fffefa;border-color:#e8e1d3}
 .cover-photo-index{position:absolute;right:9px;bottom:9px;padding:4px 8px;border-radius:999px;background:#17345b;color:#fff;font-size:10px;font-weight:800;letter-spacing:.04em}
 .dormitory-fact{font-weight:700;color:#355e49}
 @media(max-width:700px){.cover{aspect-ratio:4/3}.cover-slide img{object-fit:contain}.cover-photo-index{bottom:8px;right:8px}}
+
+/* BancoImob: galeria de fotos em proporção fotográfica 3:2 */
+.cover{height:auto;aspect-ratio:3/2;display:block;overflow:hidden;background:#f3f4f1;position:relative}
+.cover-gallery{display:flex;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+.cover-gallery::-webkit-scrollbar{display:none}
+.cover-slide{position:relative;flex:0 0 100%;width:100%;height:100%;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;background:#f3f4f1}
+.cover-slide img{display:block;width:100%;height:100%;object-fit:contain}
+.cover-photo-index{display:none!important}
+@media(max-width:700px){.cover{aspect-ratio:3/2}.cover-slide img{object-fit:contain}}
