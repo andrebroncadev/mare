@@ -40,7 +40,7 @@ Ferramenta de trabalho para organizar imóveis de temporada, consultar preços c
 
 ## Segurança e produção
 - Nunca coloque service_role, sb_secret_..., senha de banco ou segredo de upload em variáveis VITE_*; elas ficam visíveis no navegador.
-- O BancoImob usa tabelas com prefixo mare_, separadas das tabelas do Central Imóveis.
+- O BancoImob mantém seus dados de temporada separados do Central Imóveis.
 - No projeto Supabase de teste, as políticas atuais permitem acesso compartilhado a usuários autenticados. Antes de convidar outras pessoas ou usar dados reais em produção, migre para um projeto exclusivo do BancoImob e configure políticas por usuário ou organização.
 - Revise e confirme manualmente dados, valores, datas e disponibilidade antes de enviar uma oferta ao cliente.
 - O catálogo não exibe nem exige código interno de anúncio; os imóveis são identificados pelo ID do banco, sem apresentar esse identificador ao usuário.
