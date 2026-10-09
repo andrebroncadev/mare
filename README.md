@@ -26,7 +26,8 @@ Ferramenta de trabalho para organizar imóveis de temporada, consultar preços c
 - O preço genérico deve ser identificado como Diária comum ou Diária base e ficar sem datas.
 
 ## Importação e mídia
-- A importação por URL tenta ler título, descrição, imagem e metadados de vídeo do anúncio.
+- A importação por URL tenta ler título, descrição, imagens e metadados de vídeo do anúncio.
+- Ao salvar um anúncio por link, o Maré tenta copiar as fotos para o Supabase Storage para que elas não dependam do link externo original. Se a origem bloquear a cópia, o sistema avisa e mantém o link original como alternativa.
 - Alguns anúncios bloqueiam leitura automática; nesses casos, use a opção de colar texto e revise os campos antes de salvar.
 - Vídeos são adicionados por link público; o arquivo de vídeo não é enviado ao Storage pelo formulário atual.
 - Fotos são enviadas ao Supabase Storage. A configuração atual usa um bucket público para leitura das URLs.
