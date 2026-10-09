@@ -49,3 +49,15 @@ header{background:#fffefa;border-color:#e8e1d3}
 .upload-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#e9ddc1;color:#17345b;font-size:24px}
 .upload-zone b{font-size:12px}.upload-zone small{font-size:10px;color:#817a6b;font-weight:400}
 @media(max-width:700px){.photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.photo-tile img{height:112px}}
+
+/* Visão geral de valores por período */
+.home-prices{padding:0;overflow:hidden;margin-top:12px}
+.price-overview-head,.price-overview-row{display:grid;grid-template-columns:minmax(110px,1fr) minmax(150px,1.6fr) minmax(100px,.8fr);gap:12px;align-items:center;padding:13px 17px}
+.price-overview-head{background:#f1eadb;color:#7c622e;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.price-overview-row{border-top:1px solid #e8e1d3;font-size:12px;color:#625f58}
+.price-overview-row b{color:#17345b;white-space:nowrap}
+.import-prices{border:1px solid #e8e1d3;border-radius:12px;padding:14px;background:#fffefa;margin:8px 0 14px}
+.import-prices h3{font-size:13px;color:#17345b;margin:0 0 6px}
+.import-prices>p{font-size:11px;color:#77756f;line-height:1.6;margin:0 0 12px}
+.imported-price{padding:10px 0;border-top:1px solid #eee7d9}
+@media(max-width:700px){.price-overview-head,.price-overview-row{grid-template-columns:minmax(80px,1fr) minmax(100px,1.4fr) minmax(85px,.8fr);gap:7px;padding:12px 10px;font-size:10px}.price-overview-head{font-size:8px}.price-overview-row b{white-space:normal}}
