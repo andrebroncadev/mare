@@ -133,7 +133,7 @@ for(let i=0;i<photoItems.length&&!uploadError;i++){
  }else if(photo.kind==='video'){
   const savedVideo=await db.from('mare_fotos_imovel').insert({imovel_id:homeId,user_id:state.user.id,url:photo.url,legenda:'VIDEO',ordem:i,capa:false});if(savedVideo.error)uploadError=savedVideo.error;
  }else{
-  const file=photo.file,path=\`\${state.user.id}/\${homeId}/\${crypto.randomUUID()}-\${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}\`;
+  const file=photo.file,path=state.user.id+'/'+homeId+'/'+crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
   const uploaded=await db.storage.from('mare-imoveis').upload(path,file,{contentType:file.type,upsert:false});if(uploaded.error){uploadError=uploaded.error;break}
   const publicUrl=db.storage.from('mare-imoveis').getPublicUrl(path).data.publicUrl;
   const savedPhoto=await db.from('mare_fotos_imovel').insert({imovel_id:homeId,user_id:state.user.id,url:publicUrl,legenda:file.name,ordem:i,capa:isCover});if(savedPhoto.error)uploadError=savedPhoto.error;
