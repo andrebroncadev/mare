@@ -36,7 +36,7 @@ function validUrl(value) {
 function absoluteImage(raw, base) {
   try {
     const url = new URL(decodeHtml(raw).trim(), base);
-    if (url.protocol !== 'https:' || /^(data|blob):$/i.test(url.protocol)) return '';
+    if (url.protocol !== 'https:' || /^(data|blob):$/i.test(url.protocol) || url.href === new URL(base).href) return '';
     if (/(logo|avatar|icon|sprite|placeholder|loading|pixel)/i.test(url.pathname)) return '';
     return url.toString();
   } catch {
