@@ -107,7 +107,6 @@ async function getPublicProperty(token) {
     method: 'POST',
     headers: {
       apikey: anonKey,
-      Authorization: 'Bearer ' + anonKey,
       'Content-Type': 'application/json',
       Accept: 'application/json'
     },
@@ -124,7 +123,7 @@ function publicPropertyHtml(property, origin) {
   const photos = (Array.isArray(property.fotos) ? property.fotos : [])
     .map(item => absoluteHttpUrl(item?.url))
     .filter(Boolean);
-  const cover = photos[0] || new URL('/og-bancoimob.png', origin).href;
+  const cover = photos[0] || 'https://res.cloudinary.com/yif0cgpi/image/upload/v1791578737/bancoimob/bancoimob-social-preview.png';
   const description = String(property.descricao || [
     property.dormitorios ? property.dormitorios + ' dormitórios' : '',
     property.suites ? property.suites + ' suítes' : '',
