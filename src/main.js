@@ -4,7 +4,7 @@ import './style.css';
 const url = import.meta.env.VITE_SUPABASE_URL || '';
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 const ready = Boolean(url && key);
-const db = ready ? createClient(url, key) : null;
+const db = ready ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
 const app = document.querySelector('#app');
 const state = { user: null, homes: [], prices: [], page: 'inicio', query: '', mode: 'texto', draft: null, message: '', offerIds: [], offerForm: null };
 const money = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(Number(n||0));
@@ -14,7 +14,29 @@ const say = (s,bad=false) => { let t=document.querySelector('.toast');if(!t){t=d
 
 function setup(){app.innerHTML=`
 <main class="setup"><div class="logo"><i>≈</i><b>maré</b></div><section class="setup-card"><small class="kicker">PRIMEIRO ACESSO</small><h1>Seu trabalho com temporada, em um só lugar.</h1><p>O Maré está em teste usando tabelas próprias com prefixo mare_ no projeto Supabase atual. As tabelas do Central Imóveis ficam separadas, mas o serviço de login é compartilhado durante o teste.</p><div class="checklist"><div>✓ <span><b>Tabelas separadas</b><small>Usa tabelas mare_ sem modificar as tabelas existentes.</small></span></div><div>✓ <span><b>Login privado</b><small>Acesso por link enviado ao seu e-mail.</small></span></div><div>✓ <span><b>Banco protegido</b><small>Regras de acesso por usuário.</small></span></div></div><aside><b>Próximo passo</b><p>Configure <code>VITE_SUPABASE_URL</code> e <code>VITE_SUPABASE_PUBLISHABLE_KEY</code> na Vercel. As instruções estão no README do GitHub.</p></aside><a class="btn primary full" href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Abrir Supabase ↗</a><small class="fine">Nenhum dado de imóvel é salvo neste modo de configuração.</small></section><footer>Maré · Gestão de temporada, sem complicação.</footer></main>`}
-function login(){app.innerHTML=`<main class="setup"><div class="logo"><i>≈</i><b>maré</b></div><section class="setup-card"><small class="kicker">ACESSO ADMINISTRATIVO</small><h1>Entre no seu espaço.</h1><p>Vamos enviar um link de acesso seguro para o seu e-mail.</p><form id="login" class="form"><label>E-mail</label><input type="email" name="email" placeholder="voce@exemplo.com" required><button class="btn primary full">Enviar link de acesso →</button><p id="feedback"></p></form><small class="fine">Não compartilhe o link de login.</small></section><footer>Maré · Sua operação de temporada, mais simples.</footer></main>`;document.querySelector('#login').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;b.textContent='Enviando…';const {error}=await db.auth.signInWithOtp({email:new FormData(e.target).get('email'),options:{emailRedirectTo:location.origin}});const p=document.querySelector('#feedback');p.textContent=error?error.message:'Confira sua caixa de entrada e abra o link neste navegador.';p.className=error?'error':'success';b.disabled=false;b.textContent='Enviar link de acesso →';};}
+function login(mode='entrar', feedback=''){
+const creating=mode==='criar';
+app.innerHTML=`<main class="setup"><div class="logo"><i>≈</i><b>maré</b></div><section class="setup-card"><small class="kicker">ACESSO ADMINISTRATIVO</small><h1>${creating?'Crie sua conta.':'Entre no seu espaço.'}</h1><p>${creating?'Cadastre seu e-mail e crie uma senha para acessar o Maré.':'Entre com seu e-mail e senha. Sua sessão continuará ativa neste dispositivo.'}</p><form id="login" class="form"><label>E-mail</label><input type="email" name="email" autocomplete="email" placeholder="voce@exemplo.com" required><label>Senha</label><input type="password" name="password" autocomplete="${creating?'new-password':'current-password'}" minlength="6" placeholder="Mínimo de 6 caracteres" required><button class="btn primary full">${creating?'Criar conta →':'Entrar →'}</button><p id="feedback" aria-live="polite">${safe(feedback)}</p></form><button id="toggle-auth" class="btn secondary full">${creating?'Já tenho conta — entrar':'Primeiro acesso? Criar conta'}</button><button id="forgot-password" class="text-btn full" style="margin-top:14px">Esqueci minha senha</button><small class="fine">Seu acesso fica salvo neste dispositivo até você sair.</small></section><footer>Maré · Sua operação de temporada, mais simples.</footer></main>`;
+document.querySelector('#toggle-auth').onclick=()=>login(creating?'entrar':'criar');
+document.querySelector('#forgot-password').onclick=async()=>{
+const email=document.querySelector('#login [name="email"]').value.trim();
+if(!email){const p=document.querySelector('#feedback');p.textContent='Digite seu e-mail acima primeiro.';p.className='error';return}
+const b=document.querySelector('#forgot-password');b.disabled=true;
+const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin});
+const p=document.querySelector('#feedback');p.textContent=error?error.message:'Se houver uma conta para esse e-mail, você receberá instruções para redefinir a senha.';p.className=error?'error':'success';b.disabled=false;
+};
+document.querySelector('#login').onsubmit=async e=>{
+e.preventDefault();const form=e.target,b=form.querySelector('button[type="submit"],button:not([type])'),data=new FormData(form),email=String(data.get('email')).trim(),password=String(data.get('password'));
+b.disabled=true;b.textContent=creating?'Criando conta…':'Entrando…';
+const result=creating?await db.auth.signUp({email,password,options:{emailRedirectTo:location.origin}}):await db.auth.signInWithPassword({email,password});
+const p=document.querySelector('#feedback');
+if(result.error){p.textContent=result.error.message;p.className='error'}
+else if(creating&&!result.data.session){p.textContent='Conta criada. Confira seu e-mail para confirmar o cadastro e depois entre com sua senha.';p.className='success'}
+else if(creating){p.textContent='Conta criada com sucesso.';p.className='success'}
+else {p.textContent='Login realizado.';p.className='success'}
+b.disabled=false;b.textContent=creating?'Criar conta →':'Entrar →';
+};
+}
 const nav=[['inicio','Visão geral','⌂'],['imoveis','Imóveis','⌂'],['precos','Preços e períodos','▦'],['ofertas','Montar ofertas','↗'],['importar','Importar anúncio','⇧'],['temporada','Temporada 26/27','▤']];
 const seasonHomes=[{name:'Villa Di Positano',capacity:'12 pessoas',distance:'Pé na areia',cleaning:500,linen:false},{name:'Kivotos',capacity:'14 pessoas',distance:'50 m',cleaning:750,linen:true},{name:'Maiori 4',capacity:'10 pessoas',distance:'200 m',cleaning:500,linen:false},{name:'Maiori 6',capacity:'10 pessoas',distance:'200 m',cleaning:500,linen:false},{name:'Gamboa',capacity:'8 pessoas',distance:'800 m',cleaning:500,linen:false}];
 const seasonPeriods=[{label:'Dezembro (01 a 20)',values:[3000,3000,2500,2500,2000],nights:19},{label:'Natal (20 a 27) — pacote 7 noites',values:[5000,5000,4000,4000,2500],package:true,nights:7},{label:'Ano Novo (27 a 03/01) — pacote 7 noites',values:[9000,9000,6000,6000,3500],package:true,nights:7},{label:'Janeiro (03 a 10/01)',values:[6000,6000,4000,4000,2000],nights:7},{label:'Janeiro (10 a 17/01)',values:[5000,5000,3500,3500,2000],nights:7},{label:'Janeiro (17 a 24/01)',values:[5000,5000,3500,3500,2000],nights:7},{label:'Janeiro (24 a 31/01)',values:[4000,4000,3500,3500,2000],nights:7},{label:'Aniversário de SP (22 a 25/01) — pacote 3 noites',values:[5000,5000,3500,3500,2500],package:true,nights:3},{label:'Carnaval (05 a 10/02) — pacote 5 dias',values:[6000,6000,4500,4500,2500],package:true,nights:5}];
