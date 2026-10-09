@@ -106,7 +106,7 @@ function collectImages(html, current) {
   const rawUrls = html.match(/https?:\\?\/\\?\/[^"' \t\r\n<>\\]+/gi) || [];
   for (const raw of rawUrls) {
     const cleaned = raw.replace(/\\u0026/gi,'&').replace(/\\\//g,'/').replace(/[),;]+$/,'');
-    if (/\.(?:jpe?g|png|webp|avif)(?:[?#]|$)/i.test(cleaned) || /(?:image|photo|foto|gallery|galeria|uploads?)[^?#]*[?&](?:width|w)=/i.test(cleaned)) add(cleaned,'');
+    if (/\.(?:jpe?g|png|webp|avif)(?:[?#]|$)/i.test(cleaned) || /(?:image|photo|foto|gallery|galeria|uploads?|imovel|property|listing|media|cdn|storage)[^?#]*(?:[?&](?:width|w)=|\/)/i.test(cleaned)) add(cleaned,'');
   }
   return candidates.sort((a,b)=>b.score-a.score||a.order-b.order).map(x=>x.url);
 }
