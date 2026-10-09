@@ -106,3 +106,23 @@ header{background:#fffefa;border-color:#e8e1d3}
 .card-actions button{min-height:30px;padding:6px 9px}
 .card-actions .danger-text{color:#a33e36;border-color:#e8cbc6;background:#fffaf9}
 @media(max-width:600px){.import-gallery-preview>div{grid-template-columns:repeat(2,minmax(0,1fr))}.import-gallery-preview img{height:100px}.card-actions button{font-size:10px}}
+
+
+/* Consulta rápida em janela sobreposta */
+.quick-consult-backdrop{z-index:60;backdrop-filter:blur(3px)}
+.quick-consult-modal{width:min(100%,760px);max-height:92vh;overflow:auto}
+.quick-period-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.quick-period{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 9px;border:1px solid #e8e1d3;border-radius:11px;background:#fffefa;color:#17345b;text-align:left}
+.quick-period>span{font-size:20px;color:#b49350}.quick-period b{font-size:11px}.quick-period small{font-size:9px;line-height:1.4;color:#817b70}
+.quick-period.active{background:#f7f0e2;border-color:#b49350}
+.qc-homes{margin-top:15px}.qc-homes>p,.qc-note{font-size:11px;color:#817b70;line-height:1.6}
+.qc-home{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;padding:13px;margin-top:7px;border:1px solid #e8e1d3;border-radius:10px;background:#fffefa;text-align:left;color:#17345b}
+.qc-home span,.qc-selected>div,.qc-price-row>span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.qc-home b{font-size:12px}.qc-home small,.qc-selected span,.qc-price-row small{font-size:10px;color:#817b70}.qc-home strong{font-size:11px;color:#9b762e;white-space:nowrap}
+.qc-selected{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;margin-top:14px;border-top:1px solid #e8e1d3}
+.qc-selected small{font-size:9px;letter-spacing:.08em;color:#9b762e}.qc-selected b{font-size:14px;color:#17345b}
+.qc-price-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0}.qc-price-head b{font-size:12px;color:#17345b}
+.qc-price-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #eee7d9;font-size:11px}
+.qc-price-row strong{font-size:12px;color:#17345b;white-space:nowrap}.qc-note{margin:14px 0 0;padding-top:10px;border-top:1px solid #eee7d9}
+.video-upload-zone{margin-top:10px}
+@media(max-width:700px){.quick-consult-backdrop{padding:0}.quick-consult-modal{max-height:94vh;border-radius:18px 18px 0 0;padding:20px 16px}.quick-period-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-period:last-child{grid-column:1/-1}.qc-price-row{align-items:flex-start;flex-direction:column}.qc-price-row strong{white-space:normal}.qc-home{align-items:flex-start}.qc-home strong{white-space:normal}.qc-selected{align-items:flex-start;flex-direction:column}}
