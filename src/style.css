@@ -126,3 +126,15 @@ header{background:#fffefa;border-color:#e8e1d3}
 .qc-price-row strong{font-size:12px;color:#17345b;white-space:nowrap}.qc-note{margin:14px 0 0;padding-top:10px;border-top:1px solid #eee7d9}
 .video-upload-zone{margin-top:10px}
 @media(max-width:700px){.quick-consult-backdrop{padding:0}.quick-consult-modal{max-height:94vh;border-radius:18px 18px 0 0;padding:20px 16px}.quick-period-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-period:last-child{grid-column:1/-1}.qc-price-row{align-items:flex-start;flex-direction:column}.qc-price-row strong{white-space:normal}.qc-home{align-items:flex-start}.qc-home strong{white-space:normal}.qc-selected{align-items:flex-start;flex-direction:column}}
+
+.price-home-picker{display:grid;gap:8px;margin:16px 0}
+.price-home-option{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;border:1px solid #e8e1d3;border-radius:12px;background:#fffefa;color:#17345b;text-align:left;box-shadow:0 5px 18px #17345b08}
+.price-home-option span{display:flex;flex-direction:column;gap:5px;min-width:0}
+.price-home-option b{font-size:13px}.price-home-option small{font-size:10px;color:#817b70}
+.price-home-option strong{font-size:11px;color:#9b762e;white-space:nowrap}
+.price-home-option.selected{border-color:#b49350;background:#f9f4e9}
+.selected-price-sheet{margin-top:18px}
+.price-sheet-title{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.price-sheet-title h2{font:800 20px Manrope;color:#17345b;margin:5px 0}
+.price-sheet-title p{font-size:11px;color:#817b70;margin:0}
+@media(max-width:700px){.price-home-option{padding:13px}.price-home-option strong{white-space:normal}.price-sheet-title{align-items:flex-start;flex-direction:column;width:100%}.price-sheet-title .actions{width:100%}}
