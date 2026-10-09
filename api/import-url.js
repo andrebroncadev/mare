@@ -1,0 +1,102 @@
+const ALLOWED_HOST = /(^|\.)temporadalivre\.com$/i;
+
+function decodeHtml(value = '') {
+  return value
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([\da-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));
+}
+
+function meta(html, key) {
+  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const patterns = [
+    new RegExp('<meta[^>]+(?:property|name)=["\\']' + escaped + '["\\'][^>]+content=["\\']([^"\\']*)["\\'][^>]*>', 'i'),
+    new RegExp('<meta[^>]+content=["\\']([^"\\']*)["\\'][^>]+(?:property|name)=["\\']' + escaped + '["\\'][^>]*>', 'i')
+  ];
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match) return decodeHtml(match[1]);
+  }
+  return '';
+}
+
+function validUrl(value) {
+  const url = new URL(value);
+  if (url.protocol !== 'https:' || !ALLOWED_HOST.test(url.hostname) || url.username || url.password) {
+    throw new Error('Por segurança, use um link HTTPS do TemporadaLivre.');
+  }
+  return url;
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Use POST para importar um anúncio.' });
+  }
+
+  try {
+    const submitted = typeof req.body?.url === 'string' ? req.body.url.trim() : '';
+    if (!submitted || submitted.length > 2048) {
+      return res.status(400).json({ error: 'Informe um link válido do TemporadaLivre.' });
+    }
+
+    let current = validUrl(submitted);
+    let response;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      response = await fetch(current, {
+        redirect: 'manual',
+        signal: AbortSignal.timeout(12000),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; MareListingImporter/1.0)',
+          'Accept': 'text/html,application/xhtml+xml'
+        }
+      });
+      if (![301, 302, 303, 307, 308].includes(response.status)) break;
+      const location = response.headers.get('location');
+      if (!location || attempt === 3) throw new Error('O anúncio redirecionou muitas vezes.');
+      current = validUrl(new URL(location, current).toString());
+    }
+
+    if (!response?.ok) {
+      const status = response?.status || 0;
+      throw new Error(status === 403 || status === 429
+        ? 'O site bloqueou a leitura automática. Copie o texto do anúncio e use a opção “Colar texto”.'
+        : 'Não consegui abrir esse anúncio. Confira o link ou use “Colar texto”.');
+    }
+
+    const type = response.headers.get('content-type') || '';
+    if (!type.includes('text/html')) throw new Error('O link não abriu uma página de anúncio HTML.');
+    const html = (await response.text()).slice(0, 2_000_000);
+    const title = decodeHtml(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || meta(html, 'og:title')).replace(/\s+/g, ' ').trim();
+    const description = meta(html, 'og:description') || meta(html, 'description');
+    const image = meta(html, 'og:image');
+    const body = html
+      .replace(/<(script|style|noscript|svg|iframe)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
+      .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/section|\/article|\/tr)>/gi, '\n')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ');
+    const text = decodeHtml(body).replace(/\s+/g, ' ').trim().slice(0, 12000);
+    if (!title && !description && text.length < 80) {
+      throw new Error('A página não disponibilizou dados suficientes. O site pode exigir JavaScript ou bloquear importações automáticas.');
+    }
+
+    return res.status(200).json({
+      url: current.toString(),
+      title,
+      description,
+      image,
+      text
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: error?.name === 'TimeoutError'
+        ? 'A página demorou demais para responder. Tente novamente ou cole o texto do anúncio.'
+        : (error?.message || 'Não foi possível importar esse link.')
+    });
+  }
+}
