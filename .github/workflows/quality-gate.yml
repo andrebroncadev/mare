@@ -1,0 +1,50 @@
+name: Maré — qualidade supervisionada
+
+on:
+  push:
+    branches: [main, "ci/**", "feat/**", "fix/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "23 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mare-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Instalação e build de produção
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+
+      - name: Verificar build de produção
+        run: npm run build
+
+      - name: Resumo da execução
+        if: always()
+        run: |
+          {
+            echo "## Verificação de qualidade do Maré"
+            echo "- Gatilho: `${{ github.event_name }}`"
+            echo "- Branch: `${{ github.ref_name }}`"
+            echo "- Commit: `${{ github.sha }}`"
+            echo "- Resultado do job: `${{ job.status }}`"
+          } >> "$GITHUB_STEP_SUMMARY"
