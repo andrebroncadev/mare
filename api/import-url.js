@@ -108,7 +108,7 @@ function collectImages(html, current) {
     const cleaned = raw.replace(/\\u0026/gi,'&').replace(/\\\//g,'/').replace(/[),;]+$/,'');
     if (/\.(?:jpe?g|png|webp|avif)(?:[?#]|$)/i.test(cleaned) || /(?:image|photo|foto|gallery|galeria|uploads?)[^?#]*[?&](?:width|w)=/i.test(cleaned)) add(cleaned,'');
   }
-  return candidates.sort((a,b)=>b.score-a.score||a.order-b.order).slice(0,40).map(x=>x.url);
+  return candidates.sort((a,b)=>b.score-a.score||a.order-b.order).map(x=>x.url);
 }
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
