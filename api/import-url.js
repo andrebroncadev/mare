@@ -72,7 +72,12 @@ export default async function handler(req, res) {
     const html = (await response.text()).slice(0, 2_000_000);
     const title = decodeHtml(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || meta(html, 'og:title')).replace(/\s+/g, ' ').trim();
     const description = meta(html, 'og:description') || meta(html, 'description');
-    const image = meta(html, 'og:image');
+    const imageTags = html.match(/<img\\b[^>]*>/gi) || [];
+    const image = meta(html, 'og:image') || imageTags
+      .map(tag => tag.match(/\\b(?:src|data-src|data-original)\\s*=\\s*[\"']([^\"']+)[\"']/i)?.[1] || '')
+      .filter(src => src && !/(logo|avatar|icon|sprite|placeholder)/i.test(src))
+      .map(src => { try { return new URL(decodeHtml(src), current).toString(); } catch { return ''; } })
+      .find(src => /^https:\\/\\//i.test(src) && /temporadalivre\\.com/i.test(new URL(src).hostname)) || '';
     const body = html
       .replace(/<(script|style|noscript|svg|iframe)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
       .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/section|\/article|\/tr)>/gi, '\n')
