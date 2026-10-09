@@ -61,3 +61,23 @@ header{background:#fffefa;border-color:#e8e1d3}
 .import-prices>p{font-size:11px;color:#77756f;line-height:1.6;margin:0 0 12px}
 .imported-price{padding:10px 0;border-top:1px solid #eee7d9}
 @media(max-width:700px){.price-overview-head,.price-overview-row{grid-template-columns:minmax(80px,1fr) minmax(100px,1.4fr) minmax(85px,.8fr);gap:7px;padding:12px 10px;font-size:10px}.price-overview-head{font-size:8px}.price-overview-row b{white-space:normal}}
+
+/* Atalhos da tela inicial e consulta persistente de período/imóvel */
+.period-launch{background:#fffefa;border:1px solid #e8e1d3;border-radius:16px;padding:20px;margin:20px 0}
+.period-launch h2{margin:7px 0 16px;color:#17345b;font-size:20px}
+.period-launch-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.period-choice{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px 12px;border:1px solid #e8e1d3;border-radius:12px;background:#fff;color:#17345b;text-align:left;cursor:pointer}
+.period-choice>span{font-size:22px;color:#b49350}.period-choice b{font-size:12px}.period-choice small{font-size:10px;line-height:1.4;color:#827b6c}
+.period-choice.selected,.catalog-periods button.active{border-color:#b49350;background:#f7f0e2}
+.featured-homes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.featured-homes button{display:flex;flex-direction:column;gap:7px;text-align:left;padding:13px;border:1px solid #e8e1d3;border-radius:10px;background:#f7f5ef;color:#17345b;cursor:pointer}
+.featured-homes b{font-size:11px}.featured-homes span{font-size:12px;color:#9b762e}
+.catalog-selection{position:sticky;top:8px;z-index:4;background:#fffefa;border:1px solid #e8e1d3;border-radius:13px;padding:12px;margin:14px 0;box-shadow:0 6px 20px #17345b0b}
+.catalog-periods{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.catalog-periods>b{font-size:11px;color:#81765e;margin-right:4px}.catalog-periods button{border:1px solid #e8e1d3;background:white;border-radius:20px;padding:8px 11px;color:#17345b;font-size:11px;cursor:pointer}.catalog-periods button.active{font-weight:800}
+.selected-home-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0 8px;margin-top:8px;border-top:1px solid #eee7d9}.selected-home-banner div{display:flex;flex-direction:column;gap:4px}.selected-home-banner small{font-size:9px;letter-spacing:.08em;color:#9b762e}.selected-home-banner b{font-size:14px;color:#17345b}.selected-home-banner span{font-size:10px;color:#817b70}
+.selected-home-prices{border-top:1px solid #eee7d9;padding-top:8px}.selected-home-prices>b{display:block;font-size:11px;color:#17345b;margin-bottom:6px}.selected-home-prices>div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #f0eadf;font-size:11px}.selected-home-prices strong{color:#17345b}.selected-home-prices p{font-size:11px;color:#817b70}
+.custom-period{align-items:end;margin-top:12px}
+.photo-tile{cursor:grab}.photo-tile.dragging{opacity:.45;border:2px dashed #b49350}
+.card-actions{display:flex;gap:5px}.card-actions button{font-size:10px}
+@media(max-width:900px){.period-launch-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.period-launch-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.featured-homes{grid-template-columns:1fr}.catalog-selection{top:2px}.catalog-periods{gap:5px}.catalog-periods button{padding:7px 8px;font-size:10px}}
