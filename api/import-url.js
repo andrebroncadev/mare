@@ -160,12 +160,20 @@ export default async function handler(req, res) {
         if (candidate.protocol === 'https:') video = candidate.toString();
       } catch {}
     }
-    const body = html
-      .replace(/<(script|style|noscript|svg|iframe)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
+    // Remove interface chrome before extracting text so the importer receives listing details, not page controls.
+    let cleanedHtml = html
+      .replace(/<(script|style|noscript|svg|iframe|template)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
+      .replace(/<(nav|header|footer|aside|form|button|dialog)[^>]*>[\s\S]*?<\/\1>/gi, ' ');
+    // TemporadaLivre repeats quote, availability and sharing UI inside generic containers.
+    const uiContainer = /<(div|section|ul|ol)\b(?=[^>]*(?:class|id|role|aria-label|data-testid)\s*=\s*["'][^"']*(?:modal|share|favorite|favorit|contact|quote|availability|calendar|cookie|breadcrumb|social|menu|navbar|header|footer|related|recommend|login|newsletter|whatsapp|facebook|email|price-detail|price_detail|contactstate|propertystate|error-message)[^"']*["'])[^>]*>[\s\S]*?<\/\1>/gi;
+    for (let i = 0; i < 5; i++) cleanedHtml = cleanedHtml.replace(uiContainer, ' ');
+    const body = cleanedHtml
       .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/section|\/article|\/tr)>/gi, '\n')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ');
-    const text = decodeHtml(body).replace(/\s+/g, ' ').trim().slice(0, 12000);
+      .replace(/<[^>]+>/g, ' ');
+    const text = decodeHtml(body)
+      .replace(/\{\{[\s\S]*?\}\}/g, ' ')
+      .replace(/(?:Copiar link|Remover dos favoritos|Adicionar aos favoritos|Compartilhar por e-mail|Enviar pelo Whatsapp|Compartilhar pelo Facebook|Pedir Orçamento!?|Ver Telefones|Aguarde\s*\.{3}|Clique aqui para (?:ver|confirmar|pedir)|Nº de (?:Adultos|Crianças)|Digite o nome da pessoa para quem quer enviar|Qual o e-mail dela\?|Seu nome:|Seu e-mail:|Preço e disponibilidade|Detalhamento do preço|Anunciante verificado pelo TemporadaLivre|Locação 100% garantida|Resposta Rápida!?)/gi, ' ')
+      .replace(/\s+/g, ' ').trim().slice(0, 12000);
     if (!title && !description && text.length < 80) {
       throw new Error('A página não disponibilizou dados suficientes. O site pode exigir JavaScript ou bloquear importações automáticas.');
     }
