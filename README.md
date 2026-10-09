@@ -1,37 +1,44 @@
 # Maré
 
-Sistema independente para gestão de imóveis de temporada: catálogo, preços por diária e pacote, importação revisável e montagem de ofertas.
+Ferramenta de trabalho para organizar imóveis de temporada, consultar preços cadastrados e preparar ofertas para atendimento.
 
 ## Stack
 - Vite + JavaScript para a interface responsiva.
 - Vercel para hospedagem e deploy a partir do GitHub.
-- Supabase Auth + PostgreSQL com Row Level Security.
-- Cloudinary para fotos (integração de upload na próxima etapa).
+- Supabase Auth + PostgreSQL para login e dados.
+- Supabase Storage para fotos dos imóveis.
 
-## Estado atual
-O Maré está em teste no projeto Supabase já existente: suas tabelas usam o prefixo `mare_`, sem alterar as tabelas do Central Imóveis. A autenticação é compartilhada durante esse teste. Para produção, mova o Maré para um projeto exclusivo.
+## O que já existe
+- Catálogo de imóveis com capacidade, dormitórios, suítes, comodidades e status.
+- Cadastro de preços por diária ou pacote, com período e mínimo de noites.
+- Importação revisável por URL do TemporadaLivre ou texto colado.
+- Fotos com capa e ordenação; links públicos de vídeos do YouTube, Vimeo ou arquivos MP4/WebM/MOV.
+- Montagem de oferta com datas, hóspedes, comodidades, cálculo de preço e cópia para WhatsApp.
+- Login por e-mail e senha, sessão persistente e recuperação de senha.
+- Interface responsiva com identidade própria em off-white, dourado suave e azul profundo.
 
-## Configuração
-1. Para o teste atual, use o projeto Supabase existente. Para produção, crie um projeto exclusivo do Maré.
-2. As tabelas de teste com prefixo `mare_` já foram criadas no projeto atual. Em um projeto novo, execute \`database/migrations/001_initial_schema.sql\`.
-3. Em Authentication → URL Configuration, configure a URL de produção da Vercel como Site URL e permita os domínios de preview necessários.
-4. Na Vercel, abra o projeto \`mare\` → Settings → Environment Variables e adicione:
-   - \`VITE_SUPABASE_URL\`: URL do projeto Supabase novo.
-   - \`VITE_SUPABASE_PUBLISHABLE_KEY\`: chave publishable \`sb_publishable_...\` desse projeto.
-   Marque Production, Preview e Development conforme necessário e faça um novo deploy.
-5. Em Authentication → Providers, mantenha Email habilitado para login por link.
-6. Para testar localmente, copie \`.env.example\` para \`.env.local\`, preencha as variáveis e rode \`npm install\` e \`npm run dev\`.
+## Regras importantes de preço
+- O Maré não confirma disponibilidade: sempre confirme com o proprietário.
+- Um preço sazonal só entra no cálculo automático quando tem datas que cobrem a estadia inteira.
+- Preços importados com nome de período, mas sem datas, ficam como referência até que o intervalo seja cadastrado.
+- Diárias respeitam o mínimo de noites.
+- Se a estadia atravessar períodos com tarifas diferentes, o sistema pede confirmação em vez de inventar um total.
+- O preço genérico deve ser identificado como Diária comum ou Diária base e ficar sem datas.
 
-## Segurança
-- Nunca coloque \`service_role\`, \`sb_secret_...\`, senha de banco ou segredo Cloudinary em variáveis \`VITE_*\`; elas são expostas ao navegador.
-- As tabelas da migração têm RLS e políticas por \`auth.uid()\`.
-- As tabelas do Central Imóveis não devem ser alteradas pelo Maré. Durante o teste, autenticação e usuários do Supabase são compartilhados.
-- Importação automática por URL e upload Cloudinary assinado ainda serão implementados no próximo passo.
-- A primeira versão não promete disponibilidade: confirmar com o proprietário antes de fechar a reserva.
+## Importação e mídia
+- A importação por URL tenta ler título, descrição, imagem e metadados de vídeo do anúncio.
+- Alguns anúncios bloqueiam leitura automática; nesses casos, use a opção de colar texto e revise os campos antes de salvar.
+- Vídeos são adicionados por link público; o arquivo de vídeo não é enviado ao Storage pelo formulário atual.
+- Fotos são enviadas ao Supabase Storage. A configuração atual usa um bucket público para leitura das URLs.
 
-## Próximas etapas
-1. Separar o Maré em um projeto Supabase exclusivo antes do uso real.
-2. Testar CRUD do catálogo e preços e ajustar schema/interface se necessário.
-3. Implementar upload Cloudinary seguro e biblioteca de fotos.
-4. Melhorar importação por texto e URL, com validação SSRF e deduplicação.
-5. Testes automatizados e verificação final do deploy.
+## Configuração local
+1. Copie o arquivo .env.example para .env.local.
+2. Configure VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY.
+3. Rode npm install.
+4. Rode npm run dev para desenvolvimento ou npm run build para verificar a versão de produção.
+
+## Segurança e produção
+- Nunca coloque service_role, sb_secret_..., senha de banco ou segredo de upload em variáveis VITE_*; elas ficam visíveis no navegador.
+- O Maré usa tabelas com prefixo mare_, separadas das tabelas do Central Imóveis.
+- No projeto Supabase de teste, as políticas atuais permitem acesso compartilhado a usuários autenticados. Antes de convidar outras pessoas ou usar dados reais em produção, migre para um projeto exclusivo do Maré e configure políticas por usuário ou organização.
+- Revise e confirme manualmente dados, valores, datas e disponibilidade antes de enviar uma oferta ao cliente.
