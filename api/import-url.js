@@ -13,14 +13,12 @@ function decodeHtml(value = '') {
 }
 
 function meta(html, key) {
-  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const patterns = [
-    new RegExp('<meta[^>]+(?:property|name)=["\\']' + escaped + '["\\'][^>]+content=["\\']([^"\\']*)["\\'][^>]*>', 'i'),
-    new RegExp('<meta[^>]+content=["\\']([^"\\']*)["\\'][^>]+(?:property|name)=["\\']' + escaped + '["\\'][^>]*>', 'i')
-  ];
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match) return decodeHtml(match[1]);
+  const tags = html.match(/<meta\\b[^>]*>/gi) || [];
+  for (const tag of tags) {
+    const name = tag.match(/\\b(?:property|name)\\s*=\\s*["']([^"']+)["']/i)?.[1]?.toLowerCase();
+    if (name !== key.toLowerCase()) continue;
+    const content = tag.match(/\\bcontent\\s*=\\s*["']([^"']*)["']/i)?.[1];
+    if (content !== undefined) return decodeHtml(content);
   }
   return '';
 }
