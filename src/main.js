@@ -14,10 +14,8 @@ const say = (s,bad=false) => { let t=document.querySelector('.toast');if(!t){t=d
 
 function setup(){app.innerHTML=`
 <main class="setup"><div class="logo"><i>≈</i><b>maré</b></div><section class="setup-card"><small class="kicker">PRIMEIRO ACESSO</small><h1>Seu trabalho com temporada, em um só lugar.</h1><p>O Maré está em teste usando tabelas próprias com prefixo mare_ no projeto Supabase atual. As tabelas do Central Imóveis ficam separadas, mas o serviço de login é compartilhado durante o teste.</p><div class="checklist"><div>✓ <span><b>Tabelas separadas</b><small>Usa tabelas mare_ sem modificar as tabelas existentes.</small></span></div><div>✓ <span><b>Login privado</b><small>Acesso por link enviado ao seu e-mail.</small></span></div><div>✓ <span><b>Banco protegido</b><small>Regras de acesso por usuário.</small></span></div></div><aside><b>Próximo passo</b><p>Configure <code>VITE_SUPABASE_URL</code> e <code>VITE_SUPABASE_PUBLISHABLE_KEY</code> na Vercel. As instruções estão no README do GitHub.</p></aside><a class="btn primary full" href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Abrir Supabase ↗</a><small class="fine">Nenhum dado de imóvel é salvo neste modo de configuração.</small></section><footer>Maré · Gestão de temporada, sem complicação.</footer></main>`}
-function login(mode='entrar', feedback=''){
-const creating=mode==='criar';
-app.innerHTML=`<main class="setup"><div class="logo"><i>≈</i><b>maré</b></div><section class="setup-card"><small class="kicker">ACESSO ADMINISTRATIVO</small><h1>${creating?'Crie sua conta.':'Entre no seu espaço.'}</h1><p>${creating?'Cadastre seu e-mail e crie uma senha para acessar o Maré.':'Entre com seu e-mail e senha. Sua sessão continuará ativa neste dispositivo.'}</p><form id="login" class="form"><label>E-mail</label><input type="email" name="email" autocomplete="email" placeholder="voce@exemplo.com" required><label>Senha</label><input type="password" name="password" autocomplete="${creating?'new-password':'current-password'}" minlength="6" placeholder="Mínimo de 6 caracteres" required><button class="btn primary full">${creating?'Criar conta →':'Entrar →'}</button><p id="feedback" aria-live="polite">${safe(feedback)}</p></form><button id="toggle-auth" class="btn secondary full">${creating?'Já tenho conta — entrar':'Primeiro acesso? Criar conta'}</button><button id="forgot-password" class="text-btn full" style="margin-top:14px">Esqueci minha senha</button><small class="fine">Seu acesso fica salvo neste dispositivo até você sair.</small></section><footer>Maré · Sua operação de temporada, mais simples.</footer></main>`;
-document.querySelector('#toggle-auth').onclick=()=>login(creating?'entrar':'criar');
+function login(feedback=''){
+app.innerHTML=`<main class="setup"><div class="logo"><i>≈</i><b>maré</b></div><section class="setup-card"><small class="kicker">ACESSO ADMINISTRATIVO</small><h1>Entre no seu espaço.</h1><p>Entre com seu e-mail e senha. Sua sessão continuará ativa neste dispositivo.</p><form id="login" class="form"><label>E-mail</label><input type="email" name="email" autocomplete="email" placeholder="voce@exemplo.com" required><label>Senha</label><input type="password" name="password" autocomplete="current-password" placeholder="Sua senha" required><button class="btn primary full">Entrar →</button><p id="feedback" aria-live="polite">${safe(feedback)}</p></form><button id="forgot-password" class="text-btn full" style="margin-top:14px">Esqueci minha senha</button><small class="fine">Seu acesso fica salvo neste dispositivo até você sair.</small></section><footer>Maré · Sua operação de temporada, mais simples.</footer></main>`;
 document.querySelector('#forgot-password').onclick=async()=>{
 const email=document.querySelector('#login [name="email"]').value.trim();
 if(!email){const p=document.querySelector('#feedback');p.textContent='Digite seu e-mail acima primeiro.';p.className='error';return}
@@ -26,15 +24,11 @@ const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.ori
 const p=document.querySelector('#feedback');p.textContent=error?error.message:'Se houver uma conta para esse e-mail, você receberá instruções para redefinir a senha.';p.className=error?'error':'success';b.disabled=false;
 };
 document.querySelector('#login').onsubmit=async e=>{
-e.preventDefault();const form=e.target,b=form.querySelector('button[type="submit"],button:not([type])'),data=new FormData(form),email=String(data.get('email')).trim(),password=String(data.get('password'));
-b.disabled=true;b.textContent=creating?'Criando conta…':'Entrando…';
-const result=creating?await db.auth.signUp({email,password,options:{emailRedirectTo:location.origin}}):await db.auth.signInWithPassword({email,password});
+e.preventDefault();const form=e.target,b=form.querySelector('button'),data=new FormData(form),email=String(data.get('email')).trim(),password=String(data.get('password'));
+b.disabled=true;b.textContent='Entrando…';
+const {error}=await db.auth.signInWithPassword({email,password});
 const p=document.querySelector('#feedback');
-if(result.error){p.textContent=result.error.message;p.className='error'}
-else if(creating&&!result.data.session){p.textContent='Conta criada. Confira seu e-mail para confirmar o cadastro e depois entre com sua senha.';p.className='success'}
-else if(creating){p.textContent='Conta criada com sucesso.';p.className='success'}
-else {p.textContent='Login realizado.';p.className='success'}
-b.disabled=false;b.textContent=creating?'Criar conta →':'Entrar →';
+if(error){p.textContent=error.message;p.className='error';b.disabled=false;b.textContent='Entrar →'}
 };
 }
 function changePassword(){
