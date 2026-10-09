@@ -35,54 +35,81 @@ function validUrl(value) {
 
 function absoluteImage(raw, base) {
   try {
-    const url = new URL(decodeHtml(raw).trim(), base);
+    const url = new URL(decodeHtml(String(raw).replace(/\\\//g, '/').trim()), base);
     if (url.protocol !== 'https:' || url.href === new URL(base).href) return '';
-    const path = url.pathname.toLowerCase();
-    const bad = /(logo|avatar|icon|sprite|placeholder|loading|pixel|flag|keyboard|arrow|eye|password|visibility|captcha|emoji|favicon|badge)/i;
-    if (bad.test(path) || /\.(svg|gif)(?:$|\?)/i.test(path)) return '';
+    const path = decodeURIComponent(url.pathname + ' ' + url.search).toLowerCase();
+    const bad = /(logo|avatar|icon|sprite|placeholder|loading|pixel|flag|bandeira|keyboard|arrow|eye|password|visibility|captcha|emoji|favicon|badge|arrowkeys|country-flag|brasil)/i;
+    if (bad.test(path) || /\.(svg|gif|ico)(?:$|[?#])/i.test(path)) return '';
     return url.toString();
   } catch { return ''; }
 }
 
-function collectImages(html, current) {
-  const candidates = [];
-  const add = (raw, tag = '') => {
-    const url = absoluteImage(raw, current);
-    if (!url || candidates.some(x => x.url === url)) return;
-    const w = Number(tag.match(/\bwidth\s*=\s*["']?(\d+)/i)?.[1] || 0);
-    const h = Number(tag.match(/\bheight\s*=\s*["']?(\d+)/i)?.[1] || 0);
-    if ((w && w < 180) || (h && h < 130)) return;
-    let score = 0;
-    if (w >= 600) score += 4;
-    if (h >= 400) score += 4;
-    if (w >= 1000) score += 3;
-    if (/(large|original|full|high|gallery|photo|imovel|property|listing)/i.test(url)) score += 2;
-    if (/(thumb|small|mini|resize|tiny|low|150x|100x)/i.test(url)) score -= 4;
-    candidates.push({url,score,order:candidates.length});
-  };
-  const og = meta(html, 'og:image:secure_url', 'og:image');
-  const tw = meta(html, 'twitter:image', 'twitter:image:src');
-  if (og) add(og);
-  if (tw) add(tw);
-  const imageTags = html.match(/<img\b[^>]*>/gi) || [];
-  for (const tag of imageTags) {
-    if (/(flag|bandeira|keyboard|arrow|eye|password|visibility|icon|logo|captcha)/i.test(tag)) continue;
-    for (const attr of ['data-src', 'data-original', 'data-lazy-src', 'data-image', 'src']) {
-      const value = tag.match(new RegExp('\\b' + attr + '\\s*=\\s*["\\x27]([^"\\x27]+)', 'i'))?.[1];
-      if (value) add(value, tag);
-    }
-    const srcset = tag.match(/\bsrcset\s*=\s*["']([^"']+)["']/i)?.[1];
-    if (srcset) {
-      const options = srcset.split(',').map(part => part.trim()).map(part => {
-        const m = part.match(/^(\S+)\s+(\d+)(w|x)$/);
-        return m ? {url:m[1],size:Number(m[2])} : {url:part.split(/\s+/)[0],size:0};
-      }).sort((x,y)=>y.size-x.size);
-      if (options[0]?.url) add(options[0].url, tag + ' width="' + (options[0].size||0) + '"');
-    }
-  }
-  return candidates.sort((a,b)=>b.score-a.score||a.order-b.order).slice(0,12).map(x=>x.url);
+function attr(tag, name) {
+  return tag.match(new RegExp('\\b' + name + '\\s*=\\s*["\\x27]([^"\\x27]*)["\\x27]', 'i'))?.[1] || '';
 }
 
+function looksLikeUiImage(tag, raw) {
+  const hints = [raw, attr(tag, 'alt'), attr(tag, 'title'), attr(tag, 'class'), attr(tag, 'id'), attr(tag, 'aria-label'), attr(tag, 'role'), attr(tag, 'data-testid')].join(' ').toLowerCase();
+  return /(flag|bandeira|keyboard|arrow.?keys|arrow.?key|eye|password|visibility|show.?password|hide.?password|icon|logo|captcha|favicon|sprite|avatar|country.?br|brasil.?flag)/i.test(hints);
+}
+
+function collectImages(html, current) {
+  const candidates = [];
+  const seen = new Set();
+  const rejected = new Set();
+  const add = (raw, tag = '', source = 'page') => {
+    if (!raw || looksLikeUiImage(tag, raw)) return;
+    const url = absoluteImage(raw, current);
+    if (!url || rejected.has(url) || seen.has(url)) return;
+    const w = Number(attr(tag, 'width') || attr(tag, 'data-width') || 0);
+    const h = Number(attr(tag, 'height') || attr(tag, 'data-height') || 0);
+    const sizeHint = url.match(/[?&](?:width|w)=([0-9]{2,4})/i);
+    const hintedWidth = sizeHint ? Number(sizeHint[1]) : 0;
+    if ((w && w < 120) || (h && h < 100) || (w && h && w * h < 24000) || (hintedWidth && hintedWidth < 180)) return;
+    let score = 0;
+    const srcsetWidth = Number(attr(tag, 'data-original-width') || 0);
+    if (w >= 600 || hintedWidth >= 600 || srcsetWidth >= 600) score += 4;
+    if (h >= 400) score += 4;
+    if (w >= 1000 || hintedWidth >= 1000 || srcsetWidth >= 1000) score += 3;
+    if (/(large|original|full|high|gallery|photo|imovel|property|listing|image|foto)/i.test(url + ' ' + attr(tag, 'class'))) score += 2;
+    if (/(thumb|small|mini|resize|tiny|low|150x|100x|thumbnail)/i.test(url)) score -= 4;
+    if (source === 'og') score += 1;
+    seen.add(url);
+    candidates.push({url,score,order:candidates.length});
+  };
+  for (const key of ['og:image:secure_url','og:image','twitter:image','twitter:image:src']) {
+    const value = meta(html,key);
+    if (value) add(value,'','og');
+  }
+  const imageTags = html.match(/<(?:img|source)\b[^>]*>/gi) || [];
+  for (const tag of imageTags) {
+    if (looksLikeUiImage(tag, attr(tag,'src') || attr(tag,'data-src'))) {
+      for (const name of ['data-src','data-original','data-lazy-src','data-image','data-full','data-zoom-image','src']) { const rejectedUrl=absoluteImage(attr(tag,name),current); if(rejectedUrl) rejected.add(rejectedUrl); }
+      const rejectedSet=attr(tag,'srcset') || attr(tag,'data-srcset');
+      for (const part of rejectedSet.split(',')) { const rejectedUrl=absoluteImage(part.trim().split(/\s+/)[0],current); if(rejectedUrl) rejected.add(rejectedUrl); }
+      continue;
+    }
+    for (const name of ['data-src','data-original','data-lazy-src','data-image','data-full','data-zoom-image','src']) {
+      const value = attr(tag,name);
+      if (value) add(value,tag);
+    }
+    const srcset = attr(tag,'srcset') || attr(tag,'data-srcset');
+    if (srcset) {
+      const options = srcset.split(',').map(part=>part.trim()).map(part=>{
+        const m=part.match(/^(\S+)\s+(\d+)(w|x)$/);
+        return m?{url:m[1],size:Number(m[2])}:{url:part.split(/\s+/)[0],size:0};
+      }).sort((x,y)=>y.size-x.size);
+      for (const option of options.slice(0,3)) if(option.url) add(option.url,tag+' data-original-width="'+option.size+'"');
+    }
+  }
+  // Algumas galerias deixam as fotos em JSON/scripts, sem tags <img> visíveis.
+  const rawUrls = html.match(/https?:\\?\/\\?\/[^"' \t\r\n<>\\]+/gi) || [];
+  for (const raw of rawUrls) {
+    const cleaned = raw.replace(/\\u0026/gi,'&').replace(/\\\//g,'/').replace(/[),;]+$/,'');
+    if (/\.(?:jpe?g|png|webp|avif)(?:[?#]|$)/i.test(cleaned) || /(?:image|photo|foto|gallery|galeria|uploads?)[^?#]*[?&](?:width|w)=/i.test(cleaned)) add(cleaned,'');
+  }
+  return candidates.sort((a,b)=>b.score-a.score||a.order-b.order).slice(0,40).map(x=>x.url);
+}
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');

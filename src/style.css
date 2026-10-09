@@ -151,3 +151,6 @@ header{background:#fffefa;border-color:#e8e1d3}
 .amenity-order-item button{border:1px solid #e0d4bb;border-radius:6px;background:white;color:#17345b;padding:4px 8px}
 .amenity-order-item button:disabled{opacity:.3}
 @media(max-width:600px){.amenity-checks{grid-template-columns:1fr}}
+
+.field-help{margin:2px 0 4px;font-size:11px;line-height:1.6;color:#817b70}
+#content .tabs button:first-child{font-weight:600}
