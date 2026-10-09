@@ -77,7 +77,7 @@ export default async function handler(req, res) {
       .map(tag => tag.match(/\b(?:src|data-src|data-original)\s*=\s*["']([^"']+)["']/i)?.[1] || '')
       .filter(src => src && !/(logo|avatar|icon|sprite|placeholder)/i.test(src))
       .map(src => { try { return new URL(decodeHtml(src), current).toString(); } catch { return ''; } })
-      .find(src => /^https:\/\//i.test(src) && /temporadalivre\.com/i.test(new URL(src).hostname)) || '';
+      .find(src => /^https:\/\//i.test(src)) || '';
     const body = html
       .replace(/<(script|style|noscript|svg|iframe)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
       .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/section|\/article|\/tr)>/gi, '\n')
