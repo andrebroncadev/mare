@@ -56,10 +56,11 @@ function looksLikeUiImage(tag, raw) {
 function collectImages(html, current) {
   const candidates = [];
   const seen = new Set();
+  const rejected = new Set();
   const add = (raw, tag = '', source = 'page') => {
     if (!raw || looksLikeUiImage(tag, raw)) return;
     const url = absoluteImage(raw, current);
-    if (!url || seen.has(url)) return;
+    if (!url || rejected.has(url) || seen.has(url)) return;
     const w = Number(attr(tag, 'width') || attr(tag, 'data-width') || 0);
     const h = Number(attr(tag, 'height') || attr(tag, 'data-height') || 0);
     const sizeHint = url.match(/[?&](?:width|w)=([0-9]{2,4})/i);
@@ -82,7 +83,12 @@ function collectImages(html, current) {
   }
   const imageTags = html.match(/<(?:img|source)\b[^>]*>/gi) || [];
   for (const tag of imageTags) {
-    if (looksLikeUiImage(tag, attr(tag,'src') || attr(tag,'data-src'))) continue;
+    if (looksLikeUiImage(tag, attr(tag,'src') || attr(tag,'data-src'))) {
+      for (const name of ['data-src','data-original','data-lazy-src','data-image','data-full','data-zoom-image','src']) { const rejectedUrl=absoluteImage(attr(tag,name),current); if(rejectedUrl) rejected.add(rejectedUrl); }
+      const rejectedSet=attr(tag,'srcset') || attr(tag,'data-srcset');
+      for (const part of rejectedSet.split(',')) { const rejectedUrl=absoluteImage(part.trim().split(/\s+/)[0],current); if(rejectedUrl) rejected.add(rejectedUrl); }
+      continue;
+    }
     for (const name of ['data-src','data-original','data-lazy-src','data-image','data-full','data-zoom-image','src']) {
       const value = attr(tag,name);
       if (value) add(value,tag);
