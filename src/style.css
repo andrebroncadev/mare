@@ -160,3 +160,40 @@ header{background:#fffefa;border-color:#e8e1d3}
 .draft-preview-title:hover{background:#f0e4cb}
 .import-gallery-preview figure[data-preview-draft]{cursor:pointer;border-radius:8px;padding:3px;transition:transform .12s ease,box-shadow .12s ease}
 .import-gallery-preview figure[data-preview-draft]:hover{transform:translateY(-2px);box-shadow:0 3px 12px #17345b20}
+
+
+/* Identidade visual unificada */
+:root{color-scheme:light;--theme-bg:#f6f5f1;--theme-surface:#fffefa;--theme-surface-2:#e9e8e5;--theme-surface-3:#d5d4d0;--theme-text:#28292d;--theme-muted:#6f7075;--theme-line:#d8d6d0;--theme-gold:#b49350;--theme-red:#b52332;--theme-navy:#17324f;--theme-green:#26734d}
+html[data-theme="dark"]{color-scheme:dark;--theme-bg:#222326;--theme-surface:#2d2f33;--theme-surface-2:#383a3f;--theme-surface-3:#484a4f;--theme-text:#f4f1e8;--theme-muted:#b8b5ad;--theme-line:#4b4c50;--theme-gold:#d2b46b;--theme-red:#d94a57;--theme-navy:#294b6d;--theme-green:#3b9a68}
+.theme-toggle{position:fixed;right:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--theme-line);border-radius:999px;padding:9px 13px;background:var(--theme-surface);color:var(--theme-text);font:600 12px/1.2 system-ui,sans-serif;box-shadow:0 3px 14px #00000016;opacity:.88;cursor:pointer;transition:opacity .15s,transform .15s}
+.theme-toggle:hover,.theme-toggle:focus-visible{opacity:1;transform:translateY(-1px);outline:2px solid var(--theme-gold);outline-offset:2px}
+@media(max-width:600px){.theme-toggle{right:10px;bottom:10px;padding:8px 11px;font-size:11px}}
+@media print{.theme-toggle{display:none!important}}
+
+
+/* BancoImob — identidade visual unificada */
+body{background:var(--theme-bg);color:var(--theme-text)}
+.sidebar,header{background:var(--theme-surface);border-color:var(--theme-line)}
+.logo,.mobile-logo,.heading h1,.section-title h2,.welcome h2,.panel h2,.card-body h3,.metrics strong{color:var(--theme-navy)}
+.logo i,.user,.nav.active{background:var(--theme-surface-2);color:var(--theme-navy)}
+.nav{color:var(--theme-muted)}.nav.active{border:1px solid var(--theme-gold)}
+.side-bottom,.heading p,.welcome p,.metrics small,.metrics span,.card-body p,.facts,.choice small{color:var(--theme-muted)}
+.setup{background:var(--theme-bg)}.setup-card,.metrics article,.panel,.home-card,.modal,.period-launch,.catalog-selection,.photo-manager,.import-prices,.season-panel{background:var(--theme-surface);border-color:var(--theme-line);color:var(--theme-text)}
+.welcome{background:linear-gradient(115deg,var(--theme-surface) 60%,var(--theme-surface-2));border-color:var(--theme-line)}
+.btn.primary{background:var(--theme-navy);color:#fff}.btn.primary:hover{background:var(--theme-red)}
+.btn.secondary,.card-foot button,.table-wrap button,.tabs{background:var(--theme-surface-2);color:var(--theme-text);border-color:var(--theme-line)}
+.text-btn,.card-foot{color:var(--theme-navy)}.kicker,.package-tag{color:var(--theme-gold)}
+.form input,.form select,.form textarea,.toolbar input,.toolbar select{background:var(--theme-surface);color:var(--theme-text);border-color:var(--theme-line)}
+.form label,.table-wrap th,.table-wrap td,.data-table th,.data-table td{color:var(--theme-muted)}
+.cover{background:var(--theme-surface-2);color:var(--theme-gold)}
+.table-wrap,.data-table,.data-table tbody tr,.empty,.season-result,.photo-tile,.featured-homes button,.period-choice{background:var(--theme-surface);border-color:var(--theme-line);color:var(--theme-text)}
+.table-wrap th,.data-table th,.price-overview-head{background:var(--theme-surface-2);color:var(--theme-text)}
+.toast{background:var(--theme-navy);color:#fff}.toast.bad{background:var(--theme-red)}
+html[data-theme="dark"] body{background:var(--theme-bg);color:var(--theme-text)}
+html[data-theme="dark"] .sidebar,html[data-theme="dark"] header,html[data-theme="dark"] .setup-card,html[data-theme="dark"] .metrics article,html[data-theme="dark"] .panel,html[data-theme="dark"] .home-card,html[data-theme="dark"] .modal,html[data-theme="dark"] .period-launch,html[data-theme="dark"] .catalog-selection,html[data-theme="dark"] .photo-manager,html[data-theme="dark"] .import-prices,html[data-theme="dark"] .season-panel{background:var(--theme-surface);border-color:var(--theme-line);color:var(--theme-text)}
+html[data-theme="dark"] .logo,html[data-theme="dark"] .mobile-logo,html[data-theme="dark"] .heading h1,html[data-theme="dark"] .section-title h2,html[data-theme="dark"] .welcome h2,html[data-theme="dark"] .panel h2,html[data-theme="dark"] .card-body h3,html[data-theme="dark"] .metrics strong{color:var(--theme-text)}
+html[data-theme="dark"] .welcome{background:linear-gradient(115deg,var(--theme-surface),var(--theme-surface-2))}
+html[data-theme="dark"] .form input,html[data-theme="dark"] .form select,html[data-theme="dark"] .form textarea,html[data-theme="dark"] .toolbar input,html[data-theme="dark"] .toolbar select{background:#25272a;color:var(--theme-text);border-color:var(--theme-line)}
+html[data-theme="dark"] .btn.secondary,html[data-theme="dark"] .card-foot button,html[data-theme="dark"] .table-wrap button,html[data-theme="dark"] .tabs,html[data-theme="dark"] .table-wrap th,html[data-theme="dark"] .data-table th,html[data-theme="dark"] .price-overview-head{background:var(--theme-surface-2);color:var(--theme-text);border-color:var(--theme-line)}
+html[data-theme="dark"] .nav{color:var(--theme-muted)}html[data-theme="dark"] .nav.active{background:var(--theme-surface-2);color:var(--theme-text)}
+
