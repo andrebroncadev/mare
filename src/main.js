@@ -60,20 +60,31 @@ const say = (s,bad=false) => { let t=document.querySelector('.toast');if(!t){t=d
 function setup(){app.innerHTML=`
 <main class="setup"><div class="logo"><i>≈</i><b>BancoImob</b></div><section class="setup-card"><small class="kicker">PRIMEIRO ACESSO</small><h1>Seu trabalho com temporada, em um só lugar.</h1><p>O BancoImob usa uma base de dados própria para o catálogo de temporada. Os dados do Central Imóveis ficam separados, enquanto o serviço de login é compartilhado.</p><div class="checklist"><div>✓ <span><b>Tabelas separadas</b><small>Usa uma estrutura de dados exclusiva para temporada.</small></span></div><div>✓ <span><b>Login privado</b><small>Acesso com e-mail e senha, com sessão persistente neste dispositivo.</small></span></div><div>✓ <span><b>Banco protegido</b><small>Dados compartilhados entre contas autenticadas durante a fase de teste.</small></span></div></div><aside><b>Próximo passo</b><p>Configure <code>VITE_SUPABASE_URL</code> e <code>VITE_SUPABASE_PUBLISHABLE_KEY</code> na Vercel. As instruções estão no README do GitHub.</p></aside><a class="btn primary full" href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Abrir Supabase ↗</a><small class="fine">Nenhum dado de imóvel é salvo neste modo de configuração.</small></section><footer>BancoImob · Gestão de temporada, sem complicação.</footer></main>`}
 function login(feedback=''){
-app.innerHTML=`<main class="setup"><div class="logo"><i>≈</i><b>BancoImob</b></div><section class="setup-card"><small class="kicker">ACESSO ADMINISTRATIVO</small><h1>Entre no seu espaço.</h1><p>Entre com seu e-mail e senha. Sua sessão continuará ativa neste dispositivo.</p><form id="login" class="form"><label>E-mail</label><input type="email" name="email" autocomplete="email" placeholder="voce@exemplo.com" required><label>Senha</label><input type="password" name="password" autocomplete="current-password" placeholder="Sua senha" required><button class="btn primary full">Entrar →</button><p id="feedback" aria-live="polite">${safe(feedback)}</p></form><button id="forgot-password" class="text-btn full" style="margin-top:14px">Esqueci minha senha</button><small class="fine">Seu acesso fica salvo neste dispositivo até você sair.</small></section><footer>BancoImob · Sua operação de temporada, mais simples.</footer></main>`;
+app.innerHTML=`<main class="auth-login-shell">
+  <section class="auth-login-card" aria-labelledby="authTitle">
+    <div class="auth-brand"><span class="auth-logo-mark" aria-hidden="true">E</span><span><b>EBIMOB</b><small>ÁREA INTERNA</small></span></div>
+    <div class="auth-tool"><span class="auth-kicker">ACESSO SEGURO</span><h1 id="authTitle">BancoImob</h1><p>Ferramenta interna de trabalho</p></div>
+    <div class="auth-divider"></div>
+    <h2>Acesse sua conta</h2><p class="auth-subtitle">Entre com seu e-mail e senha para continuar.</p>
+    <form id="login" class="auth-form"><label for="authEmail">E-mail</label><input id="authEmail" type="email" name="email" autocomplete="username" placeholder="Seu e-mail" required><label for="authPassword">Senha</label><input id="authPassword" type="password" name="password" autocomplete="current-password" placeholder="Sua senha" required><button class="auth-submit" type="submit">Entrar <span aria-hidden="true">→</span></button><p id="feedback" class="auth-feedback" aria-live="polite">${safe(feedback)}</p></form>
+    <button id="forgot-password" class="auth-forgot" type="button">Esqueci minha senha</button>
+    <p class="auth-footnote">Acesso restrito à equipe autorizada.</p>
+  </section><footer class="auth-footer">EBIMOB · Ferramentas internas</footer>
+</main>`;
 document.querySelector('#forgot-password').onclick=async()=>{
 const email=document.querySelector('#login [name="email"]').value.trim();
-if(!email){const p=document.querySelector('#feedback');p.textContent='Digite seu e-mail acima primeiro.';p.className='error';return}
+const p=document.querySelector('#feedback');
+if(!email){p.textContent='Digite seu e-mail acima primeiro.';p.className='auth-feedback error';return}
 const b=document.querySelector('#forgot-password');b.disabled=true;
 const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin});
-const p=document.querySelector('#feedback');p.textContent=error?error.message:'Se houver uma conta para esse e-mail, você receberá instruções para redefinir a senha.';p.className=error?'error':'success';b.disabled=false;
+p.textContent=error?'Não foi possível enviar a recuperação. Confira o e-mail e tente novamente.':'Se houver uma conta para esse e-mail, você receberá instruções para redefinir a senha.';p.className='auth-feedback '+(error?'error':'success');b.disabled=false;
 };
 document.querySelector('#login').onsubmit=async e=>{
-e.preventDefault();const form=e.target,b=form.querySelector('button'),data=new FormData(form),email=String(data.get('email')).trim(),password=String(data.get('password'));
-b.disabled=true;b.textContent='Entrando…';
+e.preventDefault();const form=e.target,b=form.querySelector('button[type="submit"]'),data=new FormData(form),email=String(data.get('email')).trim(),password=String(data.get('password'));
+b.disabled=true;b.innerHTML='Entrando…';
 const {error}=await db.auth.signInWithPassword({email,password});
 const p=document.querySelector('#feedback');
-if(error){p.textContent=error.message;p.className='error';b.disabled=false;b.textContent='Entrar →'}
+if(error){p.textContent='Não foi possível entrar. Confira o e-mail e a senha.';p.className='auth-feedback error';b.disabled=false;b.innerHTML='Entrar <span aria-hidden="true">→</span>'}
 };
 }
 function changePassword(){
