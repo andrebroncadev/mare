@@ -227,3 +227,11 @@ html[data-theme="dark"] .auth-divider{background:#4b4c50}
 html[data-theme="dark"] .auth-form input{background:#25272a;color:#f4f1e8;border-color:#4b4c50}
 html[data-theme="dark"] .auth-forgot{color:#d2b46b}
 @media(max-width:420px){.auth-login-shell,.auth-shell{padding:18px 12px}.auth-login-card,.auth-card{border-radius:17px;padding:24px 20px}}
+
+/* Correção de compatibilidade para o cartão legado do BancoImob */
+.auth-card{margin:0;color:#28292d;font:inherit}
+.auth-card h2{margin:0 0 5px;font:800 19px/1.25 system-ui,sans-serif;color:#28292d}
+html[data-theme="dark"] .auth-shell{background:radial-gradient(ellipse at 80% 0%,#383a3f,transparent 42%),#222326}
+html[data-theme="dark"] .auth-card{background:#2d2f33;border-color:#4b4c50;color:#f4f1e8}
+html[data-theme="dark"] .auth-card h2{color:#f4f1e8}
+@media(max-width:420px){.auth-shell{padding:18px 12px}.auth-card{border-radius:17px;padding:24px 20px}}
