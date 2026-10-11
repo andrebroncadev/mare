@@ -56,7 +56,7 @@ function login(feedback=''){
 app.innerHTML=`<main class="auth-shell">
   <section class="auth-card" aria-labelledby="authTitle">
     <div class="auth-brand"><span class="auth-logo-mark" aria-hidden="true">E</span><span><b>EBIMOB</b><small>ÁREA INTERNA</small></span></div>
-    <div class="auth-tool"><span class="auth-kicker">ACESSO SEGURO</span><h1 id="authTitle">BancoImob</h1><p>Gestão de imóveis de temporada</p></div>
+    <div class="auth-tool"><span class="auth-kicker">ACESSO SEGURO</span><h1 id="authTitle">BancoImob</h1><p>Ferramenta interna de trabalho</p></div>
     <div class="auth-divider"></div>
     <h2>Acesse sua conta</h2><p class="auth-subtitle">Entre com seu e-mail e senha para continuar.</p>
     <form id="login" class="auth-form"><label for="authEmail">E-mail</label><input id="authEmail" type="email" name="email" autocomplete="username" placeholder="Seu e-mail" required><label for="authPassword">Senha</label><input id="authPassword" type="password" name="password" autocomplete="current-password" placeholder="Sua senha" required><button class="auth-submit" type="submit">Entrar <span aria-hidden="true">→</span></button><p id="feedback" class="auth-feedback" aria-live="polite">${safe(feedback)}</p></form>
