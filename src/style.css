@@ -200,8 +200,8 @@ html[data-theme="dark"] .nav{color:var(--theme-muted)}html[data-theme="dark"] .n
 
 
 /* EBIMOB — padrão único de autenticação para todas as ferramentas */
-.auth-login-shell{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:28px 16px;background:radial-gradient(ellipse at 80% 0%,#e9e8e5,transparent 42%),#f6f5f1}
-.auth-login-card{width:min(100%,460px);padding:clamp(24px,5vw,38px);background:#fffefa;border:1px solid #d8d6d0;border-radius:22px;box-shadow:0 24px 70px #17324f12;color:#28292d}
+.auth-login-shell,.auth-shell{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:28px 16px;background:radial-gradient(ellipse at 80% 0%,#e9e8e5,transparent 42%),#f6f5f1}
+.auth-login-card,.auth-card{width:min(100%,460px);padding:clamp(24px,5vw,38px);background:#fffefa;border:1px solid #d8d6d0;border-radius:22px;box-shadow:0 24px 70px #17324f12;color:#28292d}
 .auth-brand{display:flex;align-items:center;gap:11px;margin-bottom:28px;color:#17324f}
 .auth-logo-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#17324f;color:white;font:800 23px/1 system-ui,sans-serif;letter-spacing:-1px}
 .auth-brand b,.auth-brand small{display:block}.auth-brand b{font:800 18px/1.1 system-ui,sans-serif;letter-spacing:1.2px}.auth-brand small{margin-top:4px;color:#6f7075;font-size:9px;font-weight:800;letter-spacing:1.5px}
@@ -209,7 +209,7 @@ html[data-theme="dark"] .nav{color:var(--theme-muted)}html[data-theme="dark"] .n
 .auth-tool h1{margin:8px 0 4px;font:800 clamp(27px,5vw,34px)/1.1 system-ui,sans-serif;letter-spacing:-1px;color:#17324f}
 .auth-tool p,.auth-subtitle{margin:0;color:#6f7075;font-size:13px;line-height:1.7}
 .auth-divider{height:1px;background:#e9e8e5;margin:22px 0}
-.auth-login-card h2{margin:0 0 5px;font:800 19px/1.25 system-ui,sans-serif;color:#28292d}
+.auth-login-card,.auth-card h2{margin:0 0 5px;font:800 19px/1.25 system-ui,sans-serif;color:#28292d}
 .auth-form{display:flex;flex-direction:column;gap:9px;margin-top:20px}
 .auth-form label{margin-top:4px;color:#45464b;font-size:12px;font-weight:700}
 .auth-form input{width:100%;min-height:46px;border:1px solid #d8d6d0;border-radius:10px;padding:12px 13px;background:#fffefa;color:#28292d;font:400 14px system-ui,sans-serif;outline:none}
@@ -219,11 +219,11 @@ html[data-theme="dark"] .nav{color:var(--theme-muted)}html[data-theme="dark"] .n
 .auth-feedback{min-height:18px;margin:2px 0 0;font-size:12px;color:#6f7075}.auth-feedback.bad,.auth-feedback.error{color:#b52332}.auth-feedback.ok,.auth-feedback.success{color:#26734d}
 .auth-forgot{display:block;margin:8px auto 0;border:0;background:transparent;color:#17324f;font-size:12px;font-weight:700;cursor:pointer}.auth-forgot:hover{text-decoration:underline}
 .auth-footnote{text-align:center;margin:22px 0 0;color:#6f7075;font-size:11px}.auth-footer{color:#6f7075;font-size:11px;text-align:center}
-html[data-theme="dark"] .auth-login-shell{background:radial-gradient(ellipse at 80% 0%,#383a3f,transparent 42%),#222326}
-html[data-theme="dark"] .auth-login-card{background:#2d2f33;border-color:#4b4c50;color:#f4f1e8}
-html[data-theme="dark"] .auth-brand,html[data-theme="dark"] .auth-tool h1,html[data-theme="dark"] .auth-login-card h2,html[data-theme="dark"] .auth-form label{color:#f4f1e8}
+html[data-theme="dark"] .auth-login-shell,.auth-shell{background:radial-gradient(ellipse at 80% 0%,#383a3f,transparent 42%),#222326}
+html[data-theme="dark"] .auth-login-card,.auth-card{background:#2d2f33;border-color:#4b4c50;color:#f4f1e8}
+html[data-theme="dark"] .auth-brand,html[data-theme="dark"] .auth-tool h1,html[data-theme="dark"] .auth-login-card,.auth-card h2,html[data-theme="dark"] .auth-form label{color:#f4f1e8}
 html[data-theme="dark"] .auth-brand small,html[data-theme="dark"] .auth-tool p,html[data-theme="dark"] .auth-subtitle,html[data-theme="dark"] .auth-footnote,html[data-theme="dark"] .auth-footer{color:#b8b5ad}
 html[data-theme="dark"] .auth-divider{background:#4b4c50}
 html[data-theme="dark"] .auth-form input{background:#25272a;color:#f4f1e8;border-color:#4b4c50}
 html[data-theme="dark"] .auth-forgot{color:#d2b46b}
-@media(max-width:420px){.auth-login-shell{padding:18px 12px}.auth-login-card{border-radius:17px;padding:24px 20px}}
+@media(max-width:420px){.auth-login-shell,.auth-shell{padding:18px 12px}.auth-login-card,.auth-card{border-radius:17px;padding:24px 20px}}
