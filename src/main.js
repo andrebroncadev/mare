@@ -6,6 +6,10 @@ const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 const ready = Boolean(url && key);
 const db = ready ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
 const app = document.querySelector('#app');
+const themeKey='remax-unified-theme';
+function initThemeToggle(){const root=document.documentElement;let saved='light';try{saved=localStorage.getItem(themeKey)||'light'}catch(e){}const button=document.createElement('button');button.type='button';button.id='themeToggle';button.className='theme-toggle';button.title='Alternar entre modo claro e escuro';function apply(theme){root.dataset.theme=theme;button.textContent=theme==='dark'?'☀ Modo claro':'☾ Modo escuro';button.setAttribute('aria-pressed',String(theme==='dark'));button.setAttribute('aria-label',theme==='dark'?'Ativar modo claro':'Ativar modo escuro');const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=theme==='dark'?'#222326':'#f6f5f1'}button.addEventListener('click',()=>{const next=root.dataset.theme==='dark'?'light':'dark';apply(next);try{localStorage.setItem(themeKey,next)}catch(e){}});apply(saved);document.body.appendChild(button)}
+initThemeToggle();
+
 const state = { user: null, homes: [], prices: [], photos: [], page: 'imoveis', query: '', mode: 'url', draft: null, message: '', offerIds: [], offerForm: null, selectedPeriod: 'Diária comum', selectedHomeId: null, selectedHomeAlias: null, customPeriod: null };
 const money = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(Number(n||0));
 const minimumStay = p => Math.max(Number(p?.noites_minimas||1),/natal|réveillon|ano novo/i.test(String(p?.nome_periodo||''))?7:1);
